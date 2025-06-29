@@ -2,20 +2,20 @@ name: 🚀 Build and Deploy GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main]  # Trigger on pushes to main branch
+  workflow_dispatch:   # Allow manual trigger
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout source code
         uses: actions/checkout@v4
 
       - name: 🧰 Setup Node.js
@@ -23,22 +23,22 @@ jobs:
         with:
           node-version: 20
 
-      - name: 🛠️ Initialize npm & install Tailwind
+      - name: 🛠️ Generate package.json and install Tailwind
         run: |
-          npm init -y
+          echo '{}' > package.json
           npm install -D tailwindcss@latest autoprefixer postcss
 
-      - name: 🧪 Verify Tailwind CLI
-        run: npx tailwindcss --version
+      - name: 📜 Add build script to package.json
+        run: |
+          jq '.scripts.build="tailwindcss -i ./input.css -o ./dist/style.css --minify"' package.json > tmp.json && mv tmp.json package.json
 
       - name: 🔧 Build Tailwind CSS
-        run: |
-          npx tailwindcss -i ./input.css -o ./dist/style.css --minify
+        run: npm run build
 
-      - name: ⚙️ Setup Pages
+      - name: ⚙️ Setup GitHub Pages
         uses: actions/configure-pages@v4
 
-      - name: 📤 Upload site
+      - name: 📤 Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .

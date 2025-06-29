@@ -1,0 +1,1 @@
+[![.github/workflows/deploy.yml](https://github.com/7pandeys/7pandeys.github.io/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/7pandeys/7pandeys.github.io/actions/workflows/deploy.yml)

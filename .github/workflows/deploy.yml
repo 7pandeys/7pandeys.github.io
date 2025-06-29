@@ -1,3 +1,15 @@
+name: 🚀 Build and Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest

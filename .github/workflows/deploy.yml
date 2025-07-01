@@ -32,8 +32,8 @@ jobs:
         run: |
           jq '.scripts.build="tailwindcss -i ./input.css -o ./dist/style.css --minify"' package.json > tmp.json && mv tmp.json package.json
 
-      - name: 🔧 Build Tailwind CSS
-        run: npm run build
+#      - name: 🔧 Build Tailwind CSS
+#        run: npm run build
 
       - name: ⚙️ Setup GitHub Pages
         uses: actions/configure-pages@v4

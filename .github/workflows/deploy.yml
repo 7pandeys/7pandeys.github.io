@@ -2,8 +2,8 @@ name: 🚀 Build and Deploy GitHub Pages
 
 on:
   push:
-    branches: [main]  # Trigger on pushes to main branch
-  workflow_dispatch:   # Allow manual trigger
+    branches: [main]  # Trigger on push to main
+  workflow_dispatch:   # Allow manual trigger from GitHub UI
 
 permissions:
   contents: read
@@ -23,17 +23,59 @@ jobs:
         with:
           node-version: 20
 
-      - name: 🛠️ Generate package.json and install Tailwind
+      - name: 📦 Install TailwindCSS
         run: |
-          echo '{}' > package.json
-          npm install -D tailwindcss@latest autoprefixer postcss
+          npm init -y
+          npm install -D tailwindcss@latest postcss autoprefixer
+          npx tailwindcss init
 
-      - name: 📜 Add build script to package.json
+      - name: 📄 Create input.css
+        run: |
+          echo '@tailwind base;\n@tailwind components;\n@tailwind utilities;' > input.css
+
+      - name: ✏️ Add build script to package.json
         run: |
           jq '.scripts.build="tailwindcss -i ./input.css -o ./dist/style.css --minify"' package.json > tmp.json && mv tmp.json package.json
 
-#      - name: 🔧 Build Tailwind CSS
-#        run: npm run build
+      - name: 📁 Create dist directory
+        run: mkdir -p dist
+
+      - name: 📜 Create index.html (LinkedIn-style profile)
+        run: |
+          cat <<EOF > dist/index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>Sandeep Pandey | Data Engineer</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link href="style.css" rel="stylesheet">
+          </head>
+          <body class="bg-gray-100 text-gray-900 font-sans">
+            <div class="min-h-screen flex flex-col items-center justify-center p-6">
+              <div class="bg-white shadow-2xl rounded-2xl p-8 max-w-2xl w-full">
+                <div class="flex flex-col items-center text-center">
+                  <img src="https://avatars.githubusercontent.com/u/991" alt="Profile" class="w-32 h-32 rounded-full border-4 border-blue-500 shadow-md mb-4">
+                  <h1 class="text-3xl font-bold mb-1">Sandeep Pandey</h1>
+                  <p class="text-blue-600 text-lg font-medium">Data Engineer | AI Explorer | 🇮🇳</p>
+                  <p class="mt-4 text-gray-600">I’m passionate about building scalable data pipelines, exploring LLMs, and making tech work for impact. Let’s connect!</p>
+                </div>
+                <div class="mt-6 flex flex-wrap justify-center gap-4">
+                  <a href="https://www.linkedin.com/in/YOURUSERNAME" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600">LinkedIn</a>
+                  <a href="https://github.com/YOURUSERNAME" target="_blank" class="bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-black">GitHub</a>
+                  <a href="mailto:you@example.com" class="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600">Email Me</a>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: 🔧 Build Tailwind CSS
+        run: npm run build
+
+      - name: 🗃 Move style.css to dist
+        run: mv dist/style.css dist/style.css  # Already output here but ensures correctness
 
       - name: ⚙️ Setup GitHub Pages
         uses: actions/configure-pages@v4
@@ -41,8 +83,7 @@ jobs:
       - name: 📤 Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
 
       - name: 🚀 Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4

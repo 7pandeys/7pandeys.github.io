@@ -23,15 +23,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: 📦 Install TailwindCSS
+      - name: 🧰 Setup and Init TailwindCSS
         run: |
           npm init -y
           npm install -D tailwindcss@latest postcss autoprefixer
-          npx tailwindcss init
+          node_modules/.bin/tailwindcss init
 
-      - name: 🔧 Build Tailwind CSS directly
+
+      - name: 🛠 Build Tailwind CSS
         run: |
-          npx tailwindcss -i ./input.css -o ./dist/style.css --minify
+          echo '@tailwind base;\n@tailwind components;\n@tailwind utilities;' > input.css
+          mkdir -p dist
+          node_modules/.bin/tailwindcss -i ./input.css -o ./dist/style.css --minify
+
 
       - name: 📁 Create dist directory
         run: mkdir -p dist
